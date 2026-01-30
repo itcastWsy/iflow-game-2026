@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>春节马年祝福海报生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a0000 0%, #2d0000 50%, #1a0000 100%);
+            min-height: 100vh;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .input-section {
+            background: rgba(255, 215, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid #ffd700;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+            animation: fadeIn 1s ease-in;
+        }
+
+        .input-section h1 {
+            color: #ffd700;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group input {
+            width: 300px;
+            padding: 15px 25px;
+            font-size: 1.2em;
+            border: 2px solid #ffd700;
+            border-radius: 50px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #ffd700;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            transform: scale(1.05);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 215, 0, 0.5);
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd700 0%, #ff6b35 100%);
+            color: #8b0000;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            color: #ffd700;
+            box-shadow: 0 5px 20px rgba(255, 68, 68, 0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 68, 68, 0.6);
+        }
+
+        .poster-section {
+            display: none;
+            text-align: center;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .poster-canvas {
+            background: linear-gradient(135deg, #8b0000 0%, #dc143c 50%, #8b0000 100%);
+            border: 4px solid #ffd700;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+            margin: 20px 0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .lantern-decoration {
+            position: fixed;
+            top: 20px;
+            font-size: 3em;
+            animation: swing 3s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        }
+
+        .lantern-left {
+            left: 30px;
+        }
+
+        .lantern-right {
+            right: 30px;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes swing {
+            0%, 100% {
+                transform: rotate(-5deg);
+            }
+            50% {
+                transform: rotate(5deg);
+            }
+        }
+
+        .firework-text {
+            color: #ffd700;
+            font-size: 1.5em;
+            margin-top: 20px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div class="lantern-decoration lantern-left">🏮</div>
+    <div class="lantern-decoration lantern-right">🏮</div>
+
+    <div class="container">
+        <div class="input-section" id="inputSection">
+            <h1>🧧 春节马年祝福海报生成器 🧧</h1>
+            <div class="input-group">
+                <input type="text" id="nameInput" placeholder="请输入您的姓名" maxlength="10">
+            </div>
+            <button class="btn btn-primary" onclick="generatePoster()">生成海报</button>
+        </div>
+
+        <div class="poster-section" id="posterSection">
+            <canvas id="posterCanvas" class="poster-canvas" width="600" height="800"></canvas>
+            <div class="firework-text" id="blessingText"></div>
+            <div>
+                <button class="btn btn-primary" onclick="generateNewPoster()">重新生成</button>
+                <button class="btn btn-secondary" onclick="downloadPoster()">下载海报</button>
+                <button class="btn btn-primary" onclick="goBack()">返回输入</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // 马年祝福词库
+        const blessings = [
+            "{name}祝福马年大吉！",
+            "{name}祝您马年马到成功！",
+            "{name}恭祝马年龙马精神！",
+            "{name}愿您马年一马当先！",
+            "{name}祝福马年万事如意！",
+            "{name}祝您马年财运亨通！",
+            "{name}恭祝马年身体健康！",
+            "{name}愿您马年事业有成！",
+            "{name}祝福马年阖家幸福！",
+            "{name}祝您马年心想事成！",
+            "{name}恭祝马年前程似锦！",
+            "{name}愿您马年步步高升！",
+            "{name}祝福马年财源广进！",
+            "{name}祝您马年福星高照！",
+            "{name}恭祝马年笑口常开！",
+            "{name}愿您马年平安喜乐！",
+            "{name}祝福马年五福临门！",
+            "{name}祝您马年吉祥如意！",
+            "{name}恭祝马年好运连连！",
+            "{name}愿您马年福气满满！",
+            "{name}祝福马年鹏程万里！",
+            "{name}祝您马年飞黄腾达！",
+            "{name}恭祝马年大展宏图！",
+            "{name}愿您马年福满人间！",
+            "{name}祝福马年春风得意！",
+            "{name}祝您马年锦上添花！",
+            "{name}恭祝马年花开富贵！",
+            "{name}愿您马年金玉满堂！",
+            "{name}祝福马年福如东海！",
+            "{name}祝您马年寿比南山！"
+        ];
+
+        // 海报背景渐变色库
+        const gradients = [
+            ['#8b0000', '#dc143c', '#8b0000'],
+            ['#000033', '#000066', '#000033'],
+            ['#330000', '#660000', '#330000'],
+            ['#1a0033', '#330066', '#1a0033'],
+            ['#003300', '#006600', '#003300'],
+            ['#660000', '#cc0000', '#660000'],
+            ['#331a00', '#663300', '#331a00'],
+            ['#001a33', '#003366', '#001a33']
+        ];
+
+        let userName = '';
+        let currentBlessing = '';
+        let currentGradient = [];
+        let posterStyle = 0;
+
+        // Three.js 背景动画
+        function initThreeJS() {
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            // 创建粒子系统（金色粒子）
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 500;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.05,
+                color: 0xffd700,
+                transparent: true,
+                opacity: 0.8
+            });
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+
+            // 创建灯笼几何体
+            const lanternGroup = new THREE.Group();
+            
+            // 创建几个灯笼
+            for (let i = 0; i < 5; i++) {
+                const lanternGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+                const lanternMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                const lantern = new THREE.Mesh(lanternGeometry, lanternMaterial);
+                lantern.position.set(
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 6,
+                    (Math.random() - 0.5) * 5
+                );
+                lanternGroup.add(lantern);
+            }
+            scene.add(lanternGroup);
+
+            camera.position.z = 5;
+
+            // 动画循环
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particlesMesh.rotation.y += 0.001;
+                particlesMesh.rotation.x += 0.0005;
+                
+                lanternGroup.rotation.y += 0.002;
+                
+                // 灯笼浮动效果
+                lanternGroup.children.forEach((lantern, index) => {
+                    lantern.position.y += Math.sin(Date.now() * 0.001 + index) * 0.002;
+                });
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // 响应窗口大小变化
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // 生成祝福词
+        function generateBlessing(name) {
+            const randomIndex = Math.floor(Math.random() * blessings.length);
+            return blessings[randomIndex].replace('{name}', name);
+        }
+
+        // 生成海报
+        function generatePoster() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (!name) {
+                alert('请输入您的姓名！');
+                return;
+            }
+
+            userName = name;
+            currentBlessing = generateBlessing(name);
+            posterStyle = Math.floor(Math.random() * 4);
+            currentGradient = gradients[Math.floor(Math.random() * gradients.length)];
+
+            drawPoster();
+            
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('posterSection').style.display = 'block';
+            document.getElementById('blessingText').textContent = currentBlessing;
+        }
+
+        // 绘制海报
+        function drawPoster() {
+            const canvas = document.getElementById('posterCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制背景渐变
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, currentGradient[0]);
+            gradient.addColorStop(0.5, currentGradient[1]);
+            gradient.addColorStop(1, currentGradient[2]);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制装饰元素
+            drawDecorations(ctx, canvas);
+
+            // 绘制马年主题图案
+            drawHorseTheme(ctx, canvas);
+
+            // 绘制祝福词
+            drawBlessing(ctx, canvas);
+        }
+
+        // 绘制装饰元素
+        function drawDecorations(ctx, canvas) {
+            // 绘制边框
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+            // 绘制角落装饰
+            const cornerSize = 60;
+            ctx.fillStyle = '#ffd700';
+            
+            // 左上角
+            ctx.beginPath();
+            ctx.moveTo(20, 20 + cornerSize);
+            ctx.lineTo(20, 20);
+            ctx.lineTo(20 + cornerSize, 20);
+            ctx.lineTo(20 + cornerSize, 20 + cornerSize / 2);
+            ctx.lineTo(20 + cornerSize / 2, 20 + cornerSize);
+            ctx.closePath();
+            ctx.fill();
+
+            // 右上角
+            ctx.beginPath();
+            ctx.moveTo(canvas.width - 20 - cornerSize, 20);
+            ctx.lineTo(canvas.width - 20, 20);
+            ctx.lineTo(canvas.width - 20, 20 + cornerSize);
+            ctx.lineTo(canvas.width - 20 - cornerSize / 2, 20 + cornerSize);
+            ctx.lineTo(canvas.width - 20 - cornerSize, 20 + cornerSize / 2);
+            ctx.closePath();
+            ctx.fill();
+
+            // 左下角
+            ctx.beginPath();
+            ctx.moveTo(20, canvas.height - 20 - cornerSize);
+            ctx.lineTo(20, canvas.height - 20);
+            ctx.lineTo(20 + cornerSize, canvas.height - 20);
+            ctx.lineTo(20 + cornerSize, canvas.height - 20 - cornerSize / 2);
+            ctx.lineTo(20 + cornerSize / 2, canvas.height - 20 - cornerSize);
+            ctx.closePath();
+            ctx.fill();
+
+            // 右下角
+            ctx.beginPath();
+            ctx.moveTo(canvas.width - 20 - cornerSize, canvas.height - 20);
+            ctx.lineTo(canvas.width - 20, canvas.height - 20);
+            ctx.lineTo(canvas.width - 20, canvas.height - 20 - cornerSize);
+            ctx.lineTo(canvas.width - 20 - cornerSize / 2, canvas.height - 20 - cornerSize);
+            ctx.lineTo(canvas.width - 20 - cornerSize, canvas.height - 20 - cornerSize / 2);
+            ctx.closePath();
+            ctx.fill();
+
+            // 绘制灯笼装饰
+            drawLantern(ctx, 80, 100);
+            drawLantern(ctx, canvas.width - 80, 100);
+        }
+
+        // 绘制灯笼
+        function drawLantern(ctx, x, y) {
+            const size = 50;
+            
+            // 灯笼主体
+            ctx.fillStyle = '#ff0000';
+            ctx.beginPath();
+            ctx.ellipse(x, y, size / 2, size, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 灯笼高光
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(x - 10, y - 15, size / 4, size / 3, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 灯笼顶部
+            ctx.fillStyle = '#ffd700';
+            ctx.fillRect(x - 15, y - size - 5, 30, 10);
+            
+            // 灯笼底部
+            ctx.fillRect(x - 15, y + size - 5, 30, 10);
+            
+            // 流苏
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.moveTo(x - 10 + i * 5, y + size + 5);
+                ctx.lineTo(x - 10 + i * 5, y + size + 30 + Math.random() * 10);
+                ctx.stroke();
+            }
+        }
+
+        // 绘制马年主题
+        function drawHorseTheme(ctx, canvas) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2 - 50;
+
+            // 绘制"马"字
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(-0.1);
+            
+            ctx.font = 'bold 180px "Microsoft YaHei", "SimHei", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // 文字阴影
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetX = 5;
+            ctx.shadowOffsetY = 5;
+            
+            // 文字渐变
+            const textGradient = ctx.createLinearGradient(-100, -90, 100, 90);
+            textGradient.addColorStop(0, '#ffd700');
+            textGradient.addColorStop(0.5, '#ff6b35');
+            textGradient.addColorStop(1, '#ffd700');
+            ctx.fillStyle = textGradient;
+            
+            ctx.fillText('马', 0, 0);
+            ctx.restore();
+
+            // 绘制"年"字
+            ctx.save();
+            ctx.translate(centerX + 120, centerY + 80);
+            
+            ctx.font = 'bold 100px "Microsoft YaHei", "SimHei", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetX = 3;
+            ctx.shadowOffsetY = 3;
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.fillText('年', 0, 0);
+            ctx.restore();
+        }
+
+        // 绘制祝福词
+        function drawBlessing(ctx, canvas) {
+            const centerX = canvas.width / 2;
+            const baseY = canvas.height - 180;
+
+            ctx.save();
+            
+            // 祝福词背景
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(50, baseY - 40, canvas.width - 100, 80);
+            
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(50, baseY - 40, canvas.width - 100, 80);
+
+            // 祝福词文字
+            ctx.font = 'bold 28px "Microsoft YaHei", "SimHei", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.fillText(currentBlessing, centerX, baseY);
+            
+            ctx.restore();
+
+            // 绘制日期
+            ctx.save();
+            ctx.font = '16px "Microsoft YaHei", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.7)';
+            ctx.fillText('二〇二六年·马年', centerX, canvas.height - 30);
+            ctx.restore();
+        }
+
+        // 重新生成海报
+        function generateNewPoster() {
+            currentBlessing = generateBlessing(userName);
+            posterStyle = Math.floor(Math.random() * 4);
+            currentGradient = gradients[Math.floor(Math.random() * gradients.length)];
+            
+            drawPoster();
+            document.getElementById('blessingText').textContent = currentBlessing;
+        }
+
+        // 下载海报
+        function downloadPoster() {
+            const canvas = document.getElementById('posterCanvas');
+            const link = document.createElement('a');
+            link.download = `${userName}_马年祝福海报.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // 返回输入页面
+        function goBack() {
+            document.getElementById('posterSection').style.display = 'none';
+            document.getElementById('inputSection').style.display = 'block';
+            document.getElementById('nameInput').value = '';
+        }
+
+        // 初始化
+        window.onload = function() {
+            initThreeJS();
+        };
+
+        // 回车键触发生成
+        document.getElementById('nameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generatePoster();
+            }
+        });
+    </script>
+</body>
+</html>
