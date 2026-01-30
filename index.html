@@ -14,8 +14,8 @@
         body {
             font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
             overflow: hidden;
-            background: linear-gradient(135deg, #1a0000 0%, #2d0000 50%, #1a0000 100%);
             min-height: 100vh;
+            transition: background 0.5s ease;
         }
 
         #canvas-container {
@@ -39,21 +39,21 @@
         }
 
         .input-section {
-            background: rgba(255, 215, 0, 0.1);
             backdrop-filter: blur(10px);
-            border: 2px solid #ffd700;
+            border: 2px solid var(--theme-accent-color);
             border-radius: 20px;
             padding: 40px;
             text-align: center;
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 40px var(--theme-shadow-color);
             animation: fadeIn 1s ease-in;
+            background: var(--theme-bg-color);
         }
 
         .input-section h1 {
-            color: #ffd700;
+            color: var(--theme-accent-color);
             font-size: 2.5em;
             margin-bottom: 30px;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            text-shadow: 0 0 20px var(--theme-shadow-color);
         }
 
         .input-group {
@@ -64,22 +64,22 @@
             width: 300px;
             padding: 15px 25px;
             font-size: 1.2em;
-            border: 2px solid #ffd700;
+            border: 2px solid var(--theme-accent-color);
             border-radius: 50px;
-            background: rgba(0, 0, 0, 0.5);
-            color: #ffd700;
+            background: var(--theme-input-bg);
+            color: var(--theme-accent-color);
             text-align: center;
             outline: none;
             transition: all 0.3s ease;
         }
 
         .input-group input:focus {
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 20px var(--theme-shadow-color);
             transform: scale(1.05);
         }
 
         .input-group input::placeholder {
-            color: rgba(255, 215, 0, 0.5);
+            color: var(--theme-placeholder-color);
         }
 
         .btn {
@@ -94,25 +94,25 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #ffd700 0%, #ff6b35 100%);
-            color: #8b0000;
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+            background: var(--btn-primary-gradient);
+            color: var(--btn-primary-text);
+            box-shadow: 0 5px 20px var(--theme-shadow-color);
         }
 
         .btn-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6);
+            box-shadow: 0 8px 30px var(--theme-shadow-color);
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
-            color: #ffd700;
-            box-shadow: 0 5px 20px rgba(255, 68, 68, 0.4);
+            background: var(--btn-secondary-gradient);
+            color: var(--btn-secondary-text);
+            box-shadow: 0 5px 20px var(--theme-shadow-color);
         }
 
         .btn-secondary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(255, 68, 68, 0.6);
+            box-shadow: 0 8px 30px var(--theme-shadow-color);
         }
 
         .poster-section {
@@ -122,10 +122,9 @@
         }
 
         .poster-canvas {
-            background: linear-gradient(135deg, #8b0000 0%, #dc143c 50%, #8b0000 100%);
-            border: 4px solid #ffd700;
+            border: 4px solid var(--theme-accent-color);
             border-radius: 20px;
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 50px var(--theme-shadow-color);
             margin: 20px 0;
         }
 
@@ -156,7 +155,7 @@
             top: 20px;
             font-size: 3em;
             animation: swing 3s ease-in-out infinite;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            text-shadow: 0 0 20px var(--theme-shadow-color);
         }
 
         .lantern-left {
@@ -178,22 +177,36 @@
         }
 
         .firework-text {
-            color: #ffd700;
+            color: var(--theme-accent-color);
             font-size: 1.5em;
             margin-top: 20px;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+            text-shadow: 0 0 10px var(--theme-shadow-color);
+        }
+
+        /* 主题指示器 */
+        .theme-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            z-index: 50;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
     <div id="canvas-container"></div>
     
-    <div class="lantern-decoration lantern-left">🏮</div>
-    <div class="lantern-decoration lantern-right">🏮</div>
+    <div class="lantern-decoration lantern-left" id="lanternLeft">🏮</div>
+    <div class="lantern-decoration lantern-right" id="lanternRight">🏮</div>
 
     <div class="container">
         <div class="input-section" id="inputSection">
-            <h1>🧧 春节马年祝福海报生成器 🧧</h1>
+            <h1 id="titleText">🧧 春节马年祝福海报生成器 🧧</h1>
             <div class="input-group">
                 <input type="text" id="nameInput" placeholder="请输入您的姓名" maxlength="10">
             </div>
@@ -211,8 +224,314 @@
         </div>
     </div>
 
+    <div class="theme-indicator" id="themeIndicator">主题: 经典红金</div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
+        // ==================== 网站主题定义 ====================
+        const websiteThemes = [
+            {
+                name: "经典红金",
+                background: "linear-gradient(135deg, #1a0000 0%, #2d0000 50%, #1a0000 100%)",
+                accentColor: "#ffd700",
+                shadowColor: "rgba(255, 215, 0, 0.5)",
+                bgColor: "rgba(255, 215, 0, 0.1)",
+                inputBg: "rgba(0, 0, 0, 0.5)",
+                placeholderColor: "rgba(255, 215, 0, 0.5)",
+                btnPrimaryGradient: "linear-gradient(135deg, #ffd700 0%, #ff6b35 100%)",
+                btnPrimaryText: "#8b0000",
+                btnSecondaryGradient: "linear-gradient(135deg, #ff4444 0%, #cc0000 100%)",
+                btnSecondaryText: "#ffd700",
+                threejs: {
+                    particleColor: 0xffd700,
+                    lanternColor: 0xff0000
+                },
+                lanternEmoji: "🏮"
+            },
+            {
+                name: "深蓝星光",
+                background: "linear-gradient(135deg, #000022 0%, #000044 50%, #000022 100%)",
+                accentColor: "#00ffff",
+                shadowColor: "rgba(0, 255, 255, 0.5)",
+                bgColor: "rgba(0, 255, 255, 0.1)",
+                inputBg: "rgba(0, 0, 0, 0.5)",
+                placeholderColor: "rgba(0, 255, 255, 0.5)",
+                btnPrimaryGradient: "linear-gradient(135deg, #00ffff 0%, #0088ff 100%)",
+                btnPrimaryText: "#000022",
+                btnSecondaryGradient: "linear-gradient(135deg, #0066ff 0%, #0033cc 100%)",
+                btnSecondaryText: "#00ffff",
+                threejs: {
+                    particleColor: 0x00ffff,
+                    lanternColor: 0x0066ff
+                },
+                lanternEmoji: "⭐"
+            },
+            {
+                name: "翡翠如意",
+                background: "linear-gradient(135deg, #001a00 0%, #003300 50%, #001a00 100%)",
+                accentColor: "#00ff00",
+                shadowColor: "rgba(0, 255, 0, 0.5)",
+                bgColor: "rgba(0, 255, 0, 0.1)",
+                inputBg: "rgba(0, 0, 0, 0.5)",
+                placeholderColor: "rgba(0, 255, 0, 0.5)",
+                btnPrimaryGradient: "linear-gradient(135deg, #00ff00 0%, #00cc66 100%)",
+                btnPrimaryText: "#001a00",
+                btnSecondaryGradient: "linear-gradient(135deg, #00cc00 0%, #009900 100%)",
+                btnSecondaryText: "#00ff00",
+                threejs: {
+                    particleColor: 0x00ff00,
+                    lanternColor: 0x00cc00
+                },
+                lanternEmoji: "🎋"
+            },
+            {
+                name: "紫金祥瑞",
+                background: "linear-gradient(135deg, #1a001a 0%, #330033 50%, #1a001a 100%)",
+                accentColor: "#ff00ff",
+                shadowColor: "rgba(255, 0, 255, 0.5)",
+                bgColor: "rgba(255, 0, 255, 0.1)",
+                inputBg: "rgba(0, 0, 0, 0.5)",
+                placeholderColor: "rgba(255, 0, 255, 0.5)",
+                btnPrimaryGradient: "linear-gradient(135deg, #ff00ff 0%, #ff66ff 100%)",
+                btnPrimaryText: "#1a001a",
+                btnSecondaryGradient: "linear-gradient(135deg, #cc00cc 0%, #990099 100%)",
+                btnSecondaryText: "#ff00ff",
+                threejs: {
+                    particleColor: 0xff00ff,
+                    lanternColor: 0xcc00cc
+                },
+                lanternEmoji: "🔮"
+            },
+            {
+                name: "橙红暖阳",
+                background: "linear-gradient(135deg, #1a0a00 0%, #331a00 50%, #1a0a00 100%)",
+                accentColor: "#ff8800",
+                shadowColor: "rgba(255, 136, 0, 0.5)",
+                bgColor: "rgba(255, 136, 0, 0.1)",
+                inputBg: "rgba(0, 0, 0, 0.5)",
+                placeholderColor: "rgba(255, 136, 0, 0.5)",
+                btnPrimaryGradient: "linear-gradient(135deg, #ff8800 0%, #ffaa00 100%)",
+                btnPrimaryText: "#1a0a00",
+                btnSecondaryGradient: "linear-gradient(135deg, #ff6600 0%, #cc4400 100%)",
+                btnSecondaryText: "#ff8800",
+                threejs: {
+                    particleColor: 0xff8800,
+                    lanternColor: 0xff6600
+                },
+                lanternEmoji: "🌸"
+            },
+            {
+                name: "银装素裹",
+                background: "linear-gradient(135deg, #111 0%, #222 50%, #111 100%)",
+                accentColor: "#c0c0c0",
+                shadowColor: "rgba(192, 192, 192, 0.5)",
+                bgColor: "rgba(192, 192, 192, 0.1)",
+                inputBg: "rgba(0, 0, 0, 0.5)",
+                placeholderColor: "rgba(192, 192, 192, 0.5)",
+                btnPrimaryGradient: "linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%)",
+                btnPrimaryText: "#111",
+                btnSecondaryGradient: "linear-gradient(135deg, #a0a0a0 0%, #808080 100%)",
+                btnSecondaryText: "#c0c0c0",
+                threejs: {
+                    particleColor: 0xc0c0c0,
+                    lanternColor: 0xa0a0a0
+                },
+                lanternEmoji: "❄️"
+            },
+            {
+                name: "玫瑰浪漫",
+                background: "linear-gradient(135deg, #220011 0%, #440022 50%, #220011 100%)",
+                accentColor: "#ff69b4",
+                shadowColor: "rgba(255, 105, 180, 0.5)",
+                bgColor: "rgba(255, 105, 180, 0.1)",
+                inputBg: "rgba(0, 0, 0, 0.5)",
+                placeholderColor: "rgba(255, 105, 180, 0.5)",
+                btnPrimaryGradient: "linear-gradient(135deg, #ff69b4 0%, #ff1493 100%)",
+                btnPrimaryText: "#220011",
+                btnSecondaryGradient: "linear-gradient(135deg, #db7093 0%, #c71585 100%)",
+                btnSecondaryText: "#ff69b4",
+                threejs: {
+                    particleColor: 0xff69b4,
+                    lanternColor: 0xdb7093
+                },
+                lanternEmoji: "🌹"
+            },
+            {
+                name: "青色雅韵",
+                background: "linear-gradient(135deg, #001122 0%, #002244 50%, #001122 100%)",
+                accentColor: "#00d4aa",
+                shadowColor: "rgba(0, 212, 170, 0.5)",
+                bgColor: "rgba(0, 212, 170, 0.1)",
+                inputBg: "rgba(0, 0, 0, 0.5)",
+                placeholderColor: "rgba(0, 212, 170, 0.5)",
+                btnPrimaryGradient: "linear-gradient(135deg, #00d4aa 0%, #00ffcc 100%)",
+                btnPrimaryText: "#001122",
+                btnSecondaryGradient: "linear-gradient(135deg, #00a088 0%, #008866 100%)",
+                btnSecondaryText: "#00d4aa",
+                threejs: {
+                    particleColor: 0x00d4aa,
+                    lanternColor: 0x00a088
+                },
+                lanternEmoji: "🎏"
+            }
+        ];
+
+        // ==================== 海报风格定义 ====================
+        const posterStyles = [
+            {
+                name: "经典大气",
+                gradient: ['#8b0000', '#dc143c', '#8b0000'],
+                borderWidth: 8,
+                borderColor: '#ffd700',
+                cornerSize: 60,
+                cornerColor: '#ffd700',
+                horseSize: 180,
+                horseGradient: ['#ffd700', '#ff6b35', '#ffd700'],
+                yearSize: 100,
+                yearColor: '#ffd700',
+                lanternCount: 2,
+                lanternColor: '#ff0000',
+                lanternGold: '#ffd700',
+                blessingBoxBg: 'rgba(0, 0, 0, 0.3)',
+                blessingBoxBorder: '#ffd700',
+                blessingColor: '#ffd700',
+                layout: 'center'
+            },
+            {
+                name: "简约现代",
+                gradient: ['#1a1a2e', '#16213e', '#1a1a2e'],
+                borderWidth: 4,
+                borderColor: '#e94560',
+                cornerSize: 40,
+                cornerColor: '#e94560',
+                horseSize: 200,
+                horseGradient: ['#e94560', '#ff6b6b', '#e94560'],
+                yearSize: 120,
+                yearColor: '#e94560',
+                lanternCount: 0,
+                lanternColor: '#e94560',
+                lanternGold: '#ffffff',
+                blessingBoxBg: 'rgba(233, 69, 96, 0.2)',
+                blessingBoxBorder: '#e94560',
+                blessingColor: '#e94560',
+                layout: 'center'
+            },
+            {
+                name: "富贵牡丹",
+                gradient: ['#2d1b00', '#4a2c00', '#2d1b00'],
+                borderWidth: 12,
+                borderColor: '#ffd700',
+                cornerSize: 80,
+                cornerColor: '#ffd700',
+                horseSize: 160,
+                horseGradient: ['#ffd700', '#ffaa00', '#ffd700'],
+                yearSize: 90,
+                yearColor: '#ffaa00',
+                lanternCount: 4,
+                lanternColor: '#ff0000',
+                lanternGold: '#ffd700',
+                blessingBoxBg: 'rgba(255, 215, 0, 0.2)',
+                blessingBoxBorder: '#ffd700',
+                blessingColor: '#ffd700',
+                layout: 'rich'
+            },
+            {
+                name: "水墨风雅",
+                gradient: ['#0f0f0f', '#1a1a1a', '#0f0f0f'],
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                cornerSize: 30,
+                cornerColor: '#ffffff',
+                horseSize: 190,
+                horseGradient: ['#ffffff', '#cccccc', '#ffffff'],
+                yearSize: 110,
+                yearColor: '#ffffff',
+                lanternCount: 0,
+                lanternColor: '#333333',
+                lanternGold: '#ffffff',
+                blessingBoxBg: 'rgba(255, 255, 255, 0.1)',
+                blessingBoxBorder: '#ffffff',
+                blessingColor: '#ffffff',
+                layout: 'minimal'
+            },
+            {
+                name: "喜庆热闹",
+                gradient: ['#cc0000', '#ff0000', '#cc0000'],
+                borderWidth: 10,
+                borderColor: '#ffff00',
+                cornerSize: 70,
+                cornerColor: '#ffff00',
+                horseSize: 170,
+                horseGradient: ['#ffff00', '#ffaa00', '#ffff00'],
+                yearSize: 100,
+                yearColor: '#ffff00',
+                lanternCount: 6,
+                lanternColor: '#ff0000',
+                lanternGold: '#ffff00',
+                blessingBoxBg: 'rgba(255, 255, 0, 0.3)',
+                blessingBoxBorder: '#ffff00',
+                blessingColor: '#ffff00',
+                layout: 'festive'
+            },
+            {
+                name: "星空璀璨",
+                gradient: ['#000033', '#000066', '#000033'],
+                borderWidth: 3,
+                borderColor: '#00ffff',
+                cornerSize: 50,
+                cornerColor: '#00ffff',
+                horseSize: 185,
+                horseGradient: ['#00ffff', '#00ffaa', '#00ffff'],
+                yearSize: 105,
+                yearColor: '#00ffff',
+                lanternCount: 3,
+                lanternColor: '#0066ff',
+                lanternGold: '#00ffff',
+                blessingBoxBg: 'rgba(0, 255, 255, 0.15)',
+                blessingBoxBorder: '#00ffff',
+                blessingColor: '#00ffff',
+                layout: 'star'
+            },
+            {
+                name: "竹林清韵",
+                gradient: ['#001a00', '#003300', '#001a00'],
+                borderWidth: 6,
+                borderColor: '#00ff00',
+                cornerSize: 55,
+                cornerColor: '#00ff00',
+                horseSize: 175,
+                horseGradient: ['#00ff00', '#88ff88', '#00ff00'],
+                yearSize: 98,
+                yearColor: '#00ff00',
+                lanternCount: 2,
+                lanternColor: '#006600',
+                lanternGold: '#00ff00',
+                blessingBoxBg: 'rgba(0, 255, 0, 0.2)',
+                blessingBoxBorder: '#00ff00',
+                blessingColor: '#00ff00',
+                layout: 'nature'
+            },
+            {
+                name: "紫气东来",
+                gradient: ['#1a0033', '#330066', '#1a0033'],
+                borderWidth: 5,
+                borderColor: '#ff00ff',
+                cornerSize: 45,
+                cornerColor: '#ff00ff',
+                horseSize: 180,
+                horseGradient: ['#ff00ff', '#ff66ff', '#ff00ff'],
+                yearSize: 102,
+                yearColor: '#ff00ff',
+                lanternCount: 2,
+                lanternColor: '#990099',
+                lanternGold: '#ff00ff',
+                blessingBoxBg: 'rgba(255, 0, 255, 0.2)',
+                blessingBoxBorder: '#ff00ff',
+                blessingColor: '#ff00ff',
+                layout: 'mystic'
+            }
+        ];
+
         // 马年祝福词库
         const blessings = [
             "{name}祝福马年大吉！",
@@ -247,33 +566,59 @@
             "{name}祝您马年寿比南山！"
         ];
 
-        // 海报背景渐变色库
-        const gradients = [
-            ['#8b0000', '#dc143c', '#8b0000'],
-            ['#000033', '#000066', '#000033'],
-            ['#330000', '#660000', '#330000'],
-            ['#1a0033', '#330066', '#1a0033'],
-            ['#003300', '#006600', '#003300'],
-            ['#660000', '#cc0000', '#660000'],
-            ['#331a00', '#663300', '#331a00'],
-            ['#001a33', '#003366', '#001a33']
-        ];
-
+        // 当前状态
+        let currentTheme = null;
+        let currentPosterStyle = null;
         let userName = '';
         let currentBlessing = '';
-        let currentGradient = [];
-        let posterStyle = 0;
 
-        // Three.js 背景动画
+        // ==================== 主题切换函数 ====================
+        function applyTheme(theme) {
+            const root = document.documentElement;
+            root.style.setProperty('--theme-background', theme.background);
+            root.style.setProperty('--theme-accent-color', theme.accentColor);
+            root.style.setProperty('--theme-shadow-color', theme.shadowColor);
+            root.style.setProperty('--theme-bg-color', theme.bgColor);
+            root.style.setProperty('--theme-input-bg', theme.inputBg);
+            root.style.setProperty('--theme-placeholder-color', theme.placeholderColor);
+            root.style.setProperty('--btn-primary-gradient', theme.btnPrimaryGradient);
+            root.style.setProperty('--btn-primary-text', theme.btnPrimaryText);
+            root.style.setProperty('--btn-secondary-gradient', theme.btnSecondaryGradient);
+            root.style.setProperty('--btn-secondary-text', theme.btnSecondaryText);
+
+            document.body.style.background = theme.background;
+            document.getElementById('lanternLeft').textContent = theme.lanternEmoji;
+            document.getElementById('lanternRight').textContent = theme.lanternEmoji;
+            document.getElementById('themeIndicator').textContent = `主题: ${theme.name} | 风格: ${currentPosterStyle.name}`;
+        }
+
+        // ==================== Three.js 背景动画 ====================
+        let scene, camera, renderer, particlesMesh, lanternGroup;
+        let animationId;
+
         function initThreeJS() {
             const container = document.getElementById('canvas-container');
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             container.appendChild(renderer.domElement);
 
-            // 创建粒子系统（金色粒子）
+            createParticles();
+            createLanterns();
+
+            camera.position.z = 5;
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        function createParticles() {
             const particlesGeometry = new THREE.BufferGeometry();
             const particlesCount = 500;
             const posArray = new Float32Array(particlesCount * 3);
@@ -285,20 +630,20 @@
             particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
             const particlesMaterial = new THREE.PointsMaterial({
                 size: 0.05,
-                color: 0xffd700,
+                color: currentTheme.threejs.particleColor,
                 transparent: true,
                 opacity: 0.8
             });
-            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
             scene.add(particlesMesh);
+        }
 
-            // 创建灯笼几何体
-            const lanternGroup = new THREE.Group();
+        function createLanterns() {
+            lanternGroup = new THREE.Group();
             
-            // 创建几个灯笼
             for (let i = 0; i < 5; i++) {
                 const lanternGeometry = new THREE.SphereGeometry(0.3, 32, 32);
-                const lanternMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                const lanternMaterial = new THREE.MeshBasicMaterial({ color: currentTheme.threejs.lanternColor });
                 const lantern = new THREE.Mesh(lanternGeometry, lanternMaterial);
                 lantern.position.set(
                     (Math.random() - 0.5) * 8,
@@ -308,97 +653,74 @@
                 lanternGroup.add(lantern);
             }
             scene.add(lanternGroup);
+        }
 
-            camera.position.z = 5;
+        function updateThreeJSTheme() {
+            if (particlesMesh) {
+                particlesMesh.material.color.setHex(currentTheme.threejs.particleColor);
+            }
+            if (lanternGroup) {
+                lanternGroup.children.forEach(lantern => {
+                    lantern.material.color.setHex(currentTheme.threejs.lanternColor);
+                });
+            }
+        }
 
-            // 动画循环
-            function animate() {
-                requestAnimationFrame(animate);
-                
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            
+            if (particlesMesh) {
                 particlesMesh.rotation.y += 0.001;
                 particlesMesh.rotation.x += 0.0005;
-                
+            }
+            
+            if (lanternGroup) {
                 lanternGroup.rotation.y += 0.002;
                 
-                // 灯笼浮动效果
                 lanternGroup.children.forEach((lantern, index) => {
                     lantern.position.y += Math.sin(Date.now() * 0.001 + index) * 0.002;
                 });
-
-                renderer.render(scene, camera);
-            }
-            animate();
-
-            // 响应窗口大小变化
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        }
-
-        // 生成祝福词
-        function generateBlessing(name) {
-            const randomIndex = Math.floor(Math.random() * blessings.length);
-            return blessings[randomIndex].replace('{name}', name);
-        }
-
-        // 生成海报
-        function generatePoster() {
-            const name = document.getElementById('nameInput').value.trim();
-            if (!name) {
-                alert('请输入您的姓名！');
-                return;
             }
 
-            userName = name;
-            currentBlessing = generateBlessing(name);
-            posterStyle = Math.floor(Math.random() * 4);
-            currentGradient = gradients[Math.floor(Math.random() * gradients.length)];
-
-            drawPoster();
-            
-            document.getElementById('inputSection').style.display = 'none';
-            document.getElementById('posterSection').style.display = 'block';
-            document.getElementById('blessingText').textContent = currentBlessing;
+            renderer.render(scene, camera);
         }
 
-        // 绘制海报
+        // ==================== 海报绘制函数 ====================
         function drawPoster() {
             const canvas = document.getElementById('posterCanvas');
             const ctx = canvas.getContext('2d');
+            const style = currentPosterStyle;
 
             // 清空画布
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // 绘制背景渐变
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            gradient.addColorStop(0, currentGradient[0]);
-            gradient.addColorStop(0.5, currentGradient[1]);
-            gradient.addColorStop(1, currentGradient[2]);
+            gradient.addColorStop(0, style.gradient[0]);
+            gradient.addColorStop(0.5, style.gradient[1]);
+            gradient.addColorStop(1, style.gradient[2]);
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // 绘制装饰元素
-            drawDecorations(ctx, canvas);
+            drawDecorations(ctx, canvas, style);
 
             // 绘制马年主题图案
-            drawHorseTheme(ctx, canvas);
+            drawHorseTheme(ctx, canvas, style);
 
             // 绘制祝福词
-            drawBlessing(ctx, canvas);
+            drawBlessing(ctx, canvas, style);
         }
 
-        // 绘制装饰元素
-        function drawDecorations(ctx, canvas) {
+        function drawDecorations(ctx, canvas, style) {
             // 绘制边框
-            ctx.strokeStyle = '#ffd700';
-            ctx.lineWidth = 8;
+            ctx.strokeStyle = style.borderColor;
+            ctx.lineWidth = style.borderWidth;
             ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
 
             // 绘制角落装饰
-            const cornerSize = 60;
-            ctx.fillStyle = '#ffd700';
+            const cornerSize = style.cornerSize;
+            ctx.fillStyle = style.cornerColor;
             
             // 左上角
             ctx.beginPath();
@@ -441,16 +763,27 @@
             ctx.fill();
 
             // 绘制灯笼装饰
-            drawLantern(ctx, 80, 100);
-            drawLantern(ctx, canvas.width - 80, 100);
+            if (style.lanternCount > 0) {
+                const lanternPositions = [
+                    [80, 100],
+                    [canvas.width - 80, 100],
+                    [150, 200],
+                    [canvas.width - 150, 200],
+                    [100, 300],
+                    [canvas.width - 100, 300]
+                ];
+                
+                for (let i = 0; i < style.lanternCount && i < lanternPositions.length; i++) {
+                    drawLantern(ctx, lanternPositions[i][0], lanternPositions[i][1], style);
+                }
+            }
         }
 
-        // 绘制灯笼
-        function drawLantern(ctx, x, y) {
+        function drawLantern(ctx, x, y, style) {
             const size = 50;
             
             // 灯笼主体
-            ctx.fillStyle = '#ff0000';
+            ctx.fillStyle = style.lanternColor;
             ctx.beginPath();
             ctx.ellipse(x, y, size / 2, size, 0, 0, Math.PI * 2);
             ctx.fill();
@@ -462,14 +795,14 @@
             ctx.fill();
             
             // 灯笼顶部
-            ctx.fillStyle = '#ffd700';
+            ctx.fillStyle = style.lanternGold;
             ctx.fillRect(x - 15, y - size - 5, 30, 10);
             
             // 灯笼底部
             ctx.fillRect(x - 15, y + size - 5, 30, 10);
             
             // 流苏
-            ctx.strokeStyle = '#ffd700';
+            ctx.strokeStyle = style.lanternGold;
             ctx.lineWidth = 2;
             for (let i = 0; i < 5; i++) {
                 ctx.beginPath();
@@ -479,17 +812,45 @@
             }
         }
 
-        // 绘制马年主题
-        function drawHorseTheme(ctx, canvas) {
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2 - 50;
+        function drawHorseTheme(ctx, canvas, style) {
+            let centerX, centerY;
+            
+            switch(style.layout) {
+                case 'rich':
+                    centerX = canvas.width / 2;
+                    centerY = canvas.height / 2 - 30;
+                    break;
+                case 'minimal':
+                    centerX = canvas.width / 2;
+                    centerY = canvas.height / 2 - 40;
+                    break;
+                case 'festive':
+                    centerX = canvas.width / 2;
+                    centerY = canvas.height / 2 - 20;
+                    break;
+                case 'star':
+                    centerX = canvas.width / 2;
+                    centerY = canvas.height / 2 - 35;
+                    break;
+                case 'nature':
+                    centerX = canvas.width / 2;
+                    centerY = canvas.height / 2 - 38;
+                    break;
+                case 'mystic':
+                    centerX = canvas.width / 2;
+                    centerY = canvas.height / 2 - 36;
+                    break;
+                default:
+                    centerX = canvas.width / 2;
+                    centerY = canvas.height / 2 - 50;
+            }
 
             // 绘制"马"字
             ctx.save();
             ctx.translate(centerX, centerY);
             ctx.rotate(-0.1);
             
-            ctx.font = 'bold 180px "Microsoft YaHei", "SimHei", sans-serif';
+            ctx.font = `bold ${style.horseSize}px "Microsoft YaHei", "SimHei", sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
@@ -501,9 +862,9 @@
             
             // 文字渐变
             const textGradient = ctx.createLinearGradient(-100, -90, 100, 90);
-            textGradient.addColorStop(0, '#ffd700');
-            textGradient.addColorStop(0.5, '#ff6b35');
-            textGradient.addColorStop(1, '#ffd700');
+            textGradient.addColorStop(0, style.horseGradient[0]);
+            textGradient.addColorStop(0.5, style.horseGradient[1]);
+            textGradient.addColorStop(1, style.horseGradient[2]);
             ctx.fillStyle = textGradient;
             
             ctx.fillText('马', 0, 0);
@@ -513,7 +874,7 @@
             ctx.save();
             ctx.translate(centerX + 120, centerY + 80);
             
-            ctx.font = 'bold 100px "Microsoft YaHei", "SimHei", sans-serif';
+            ctx.font = `bold ${style.yearSize}px "Microsoft YaHei", "SimHei", sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
@@ -522,23 +883,22 @@
             ctx.shadowOffsetX = 3;
             ctx.shadowOffsetY = 3;
             
-            ctx.fillStyle = '#ffd700';
+            ctx.fillStyle = style.yearColor;
             ctx.fillText('年', 0, 0);
             ctx.restore();
         }
 
-        // 绘制祝福词
-        function drawBlessing(ctx, canvas) {
+        function drawBlessing(ctx, canvas, style) {
             const centerX = canvas.width / 2;
             const baseY = canvas.height - 180;
 
             ctx.save();
             
             // 祝福词背景
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillStyle = style.blessingBoxBg;
             ctx.fillRect(50, baseY - 40, canvas.width - 100, 80);
             
-            ctx.strokeStyle = '#ffd700';
+            ctx.strokeStyle = style.blessingBoxBorder;
             ctx.lineWidth = 2;
             ctx.strokeRect(50, baseY - 40, canvas.width - 100, 80);
 
@@ -547,12 +907,12 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
-            ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+            ctx.shadowColor = style.blessingColor;
             ctx.shadowBlur = 10;
             ctx.shadowOffsetX = 2;
             ctx.shadowOffsetY = 2;
             
-            ctx.fillStyle = '#ffd700';
+            ctx.fillStyle = style.blessingColor;
             ctx.fillText(currentBlessing, centerX, baseY);
             
             ctx.restore();
@@ -561,39 +921,76 @@
             ctx.save();
             ctx.font = '16px "Microsoft YaHei", sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillStyle = 'rgba(255, 215, 0, 0.7)';
+            ctx.fillStyle = style.blessingColor;
+            ctx.globalAlpha = 0.7;
             ctx.fillText('二〇二六年·马年', centerX, canvas.height - 30);
             ctx.restore();
         }
 
-        // 重新生成海报
+        // ==================== 功能函数 ====================
+        function generateBlessing(name) {
+            const randomIndex = Math.floor(Math.random() * blessings.length);
+            return blessings[randomIndex].replace('{name}', name);
+        }
+
+        function generatePoster() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (!name) {
+                alert('请输入您的姓名！');
+                return;
+            }
+
+            userName = name;
+            currentBlessing = generateBlessing(name);
+            
+            drawPoster();
+            
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('posterSection').style.display = 'block';
+            document.getElementById('blessingText').textContent = currentBlessing;
+            document.getElementById('themeIndicator').textContent = `主题: ${currentTheme.name} | 风格: ${currentPosterStyle.name}`;
+        }
+
         function generateNewPoster() {
             currentBlessing = generateBlessing(userName);
-            posterStyle = Math.floor(Math.random() * 4);
-            currentGradient = gradients[Math.floor(Math.random() * gradients.length)];
-            
             drawPoster();
             document.getElementById('blessingText').textContent = currentBlessing;
         }
 
-        // 下载海报
         function downloadPoster() {
             const canvas = document.getElementById('posterCanvas');
             const link = document.createElement('a');
-            link.download = `${userName}_马年祝福海报.png`;
+            link.download = `${userName}_马年祝福海报_${currentPosterStyle.name}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         }
 
-        // 返回输入页面
         function goBack() {
             document.getElementById('posterSection').style.display = 'none';
             document.getElementById('inputSection').style.display = 'block';
             document.getElementById('nameInput').value = '';
+            document.getElementById('themeIndicator').textContent = `主题: ${currentTheme.name} | 风格: ${currentPosterStyle.name}`;
         }
 
-        // 初始化
+        function randomizeThemeAndStyle() {
+            // 随机选择主题
+            currentTheme = websiteThemes[Math.floor(Math.random() * websiteThemes.length)];
+            
+            // 随机选择海报风格
+            currentPosterStyle = posterStyles[Math.floor(Math.random() * posterStyles.length)];
+            
+            // 应用主题
+            applyTheme(currentTheme);
+            
+            // 更新Three.js主题
+            if (particlesMesh && lanternGroup) {
+                updateThreeJSTheme();
+            }
+        }
+
+        // ==================== 初始化 ====================
         window.onload = function() {
+            randomizeThemeAndStyle();
             initThreeJS();
         };
 
